@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logistic Regression Education Lab</title>
+<style>
+:root{--ink:#172033;--muted:#61708a;--line:#dbe3ef;--paper:#f7f9fc;--card:#fff;--navy:#183b56;--blue:#2574a9;--teal:#16817a;--gold:#e99d2e;--coral:#dc5b62;--softblue:#eaf4fb;--softgold:#fff5df;--softteal:#e8f7f4;--shadow:0 12px 30px rgba(24,59,86,.09)}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#f4f8fb 0%,#f8f5ef 100%);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 18px 42px}
+.hero{background:var(--navy);color:#fff;border-radius:24px;padding:28px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:250px;height:250px;border-radius:50%;right:-70px;top:-120px;background:rgba(255,255,255,.09)}
+h1{font-size:clamp(26px,4vw,42px);line-height:1.06;margin:0 0 9px;letter-spacing:-.03em}
+.hero p{max-width:760px;margin:0;color:#dcecf5;font-size:16px}
+.tag{display:inline-flex;align-items:center;gap:7px;background:#e9f5f8;color:var(--navy);font-weight:800;border-radius:999px;padding:6px 11px;font-size:12px;margin-bottom:15px;text-transform:uppercase;letter-spacing:.08em}
+.grid{display:grid;grid-template-columns:330px 1fr;gap:18px;margin-top:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:19px;box-shadow:var(--shadow)}
+.card h2{font-size:18px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 15px}
+.control{border-top:1px solid #edf0f5;padding:14px 0 2px}
+.control:first-of-type{border-top:0;padding-top:0}
+.labelrow{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-weight:750}
+.value{font-variant-numeric:tabular-nums;color:var(--blue);font-weight:850;background:var(--softblue);padding:2px 7px;border-radius:7px}
+.hint{font-size:12px;color:var(--muted);margin:3px 0 8px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.buttonrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+button{border:0;border-radius:10px;padding:9px 12px;font-weight:750;cursor:pointer;background:var(--navy);color:#fff}
+button.secondary{background:#edf2f7;color:var(--navy)}
+button:hover{filter:brightness(1.07)}
+button:focus-visible,input:focus-visible{outline:3px solid #f3be57;outline-offset:2px}
+.plotcard{padding:15px}
+.plothead{display:flex;justify-content:space-between;gap:12px;align-items:start;padding:4px 6px 10px}
+.plothead p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.legend{font-size:12px;color:var(--muted);white-space:nowrap}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.curve{background:var(--blue)}
+.student{background:var(--coral)}
+canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;border:1px solid #e4ebf2}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+.metric{background:var(--paper);border-radius:12px;padding:11px}
+.metric .k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+.metric .v{font-size:22px;line-height:1.2;font-weight:850;color:var(--navy);font-variant-numeric:tabular-nums}
+.metric small{color:var(--muted);font-size:11px}
+.equation{margin-top:12px;padding:13px 15px;background:var(--softgold);border-radius:12px;border-left:4px solid var(--gold);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow:auto;white-space:nowrap}
+.equation strong{color:var(--navy)}
+.lower{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.explain{display:grid;gap:10px}
+.step{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start}
+.num{width:28px;height:28px;border-radius:50%;background:var(--softteal);color:var(--teal);display:grid;place-items:center;font-weight:900}
+.step b{display:block}
+.step p{margin:1px 0 0;color:var(--muted);font-size:13px}
+.challenge{background:linear-gradient(145deg,#fffdf8,#fff7e8);border-color:#f3dbab}
+.challenge h2{color:#8d5c08}
+.q{font-weight:750;margin:10px 0}
+.choices{display:flex;gap:8px;flex-wrap:wrap}
+.choice{background:#fff;border:1px solid #edcc8b;color:#7c5108}
+.feedback{min-height:24px;color:var(--muted);font-size:13px;margin-top:10px;font-weight:650}
+.refs{margin-top:18px;padding:15px 18px;border-radius:16px;background:#eef5fa;border:1px solid #d3e4ee;color:#35536b;font-size:12px}
+.refs b{color:var(--navy)}
+.refs p{margin:5px 0}
+.footer-note{font-size:11px;color:var(--muted);margin-top:12px}
+@media(max-width:850px){
+  .grid,.lower{grid-template-columns:1fr}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+
+<body>
+<main class="wrap">
+
+<section class="hero">
+  <div class="tag">Interactive statistics lab · simulated data</div>
+  <h1>How does a logistic model turn evidence into probability?</h1>
+  <p>
+    Explore a simplified education-research scenario: the predicted probability
+    that a student passes a course, based on attendance and prior achievement.
+    Change the model and the student, then explain what moved—and why.
+  </p>
+</section>
+
+<section class="grid">
+
+<aside class="card" aria-label="Model controls">
+  <h2>1. Change the model</h2>
+  <p class="sub">These are coefficients, not percentages. They move the log-odds.</p>
+
+  <div class="control">
+    <div class="labelrow">
+      <label for="intercept">Intercept (β₀)</label>
+      <span class="value" id="interceptVal"></span>
+    </div>
+    <p class="hint">Baseline log-odds when predictors are 0.</p>
+    <input id="intercept" type="range" min="-6" max="2" step="0.1" value="-2.1">
+  </div>
+
+  <div class="control">
+    <div class="labelrow">
+      <label for="bAttend">Attendance coefficient (β₁)</label>
+      <span class="value" id="bAttendVal"></span>
+    </div>
+    <p class="hint">Change in log-odds for each 1-point increase.</p>
+    <input id="bAttend" type="range" min="-0.08" max="0.12" step="0.01" value="0.06">
+  </div>
+
+  <div class="control">
+    <div class="labelrow">
+      <label for="bPrior">Prior achievement coefficient (β₂)</label>
+      <span class="value" id="bPriorVal"></span>
+    </div>
+    <p class="hint">Change in log-odds for each 1-point increase.</p>
+    <input id="bPrior" type="range" min="-0.08" max="0.12" step="0.01" value="0.045">
+  </div>
+
+  <h2 style="margin-top:20px">2. Change the student</h2>
+  <p class="sub">The model uses the student's values to calculate a prediction.</p>
+
+  <div class="control">
+    <div class="labelrow">
+      <label for="attendance">Attendance (%)</label>
+      <span class="value" id="attendanceVal"></span>
+    </div>
+    <input id="attendance" type="range" min="50" max="100" step="1" value="88">
+  </div>
+
+  <div class="control">
+    <div class="labelrow">
+      <label for="prior">Prior achievement (0–100)</label>
+      <span class="value" id="priorVal"></span>
+    </div>
+    <input id="prior" type="range" min="0" max="100" step="1" value="72">
+  </div>
+
+  <div class="buttonrow">
+    <button class="secondary" id="reset">Reset example</button>
+    <button id="randomize">Try a new student</button>
+  </div>
+</aside>
+
+<section class="card plotcard">
+  <div class="plothead">
+    <div>
+      <h2>Predicted probability of passing</h2>
+      <p>Move attendance to travel along the S-curve. The red point is the current student.</p>
+    </div>
+    <div class="legend">
+      <span class="dot curve"></span>model curve<br>
+      <span class="dot student"></span>student
+    </div>
+  </div>
+
+  <canvas id="plot" width="820" height="430"
+    role="img"
+    aria-label="Logistic regression probability curve"></canvas>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="k">Linear predictor η</div>
+      <div class="v" id="eta"></div>
+      <small>β₀ + β₁x₁ + β₂x₂</small>
+    </div>
+
+    <div class="metric">
+      <div class="k">Odds</div>
+      <div class="v" id="odds"></div>
+      <small>e raised to η</small>
+    </div>
+
+    <div class="metric">
+      <div class="k">Probability</div>
+      <div class="v" id="prob"></div>
+      <small>odds ÷ (1 + odds)</small>
+    </div>
+
+    <div class="metric">
+      <div class="k">Classification</div>
+      <div class="v" id="classify"></div>
+      <small>using a 0.50 cutoff</small>
+    </div>
+  </div>
+
+  <div class="equation">
+    <strong>logit(p)</strong> = ln[p/(1−p)] =
+    <span id="eqText"></span>
+  </div>
+</section>
+
+</section>
+
+<section class="lower">
+
+<section class="card explain">
+  <h2>What the graph is teaching</h2>
+  <p class="sub">A logistic model connects three different scales.</p>
+
+  <div class="step">
+    <div class="num">1</div>
+    <div>
+      <b>Linear predictor</b>
+      <p>
+        The model adds weighted evidence:
+        η = β₀ + β₁(attendance) + β₂(prior achievement).
+      </p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">2</div>
+    <div>
+      <b>Log-odds → odds</b>
+      <p>
+        Exponentiating η gives odds. An odds ratio above 1 means higher odds;
+        below 1 means lower odds.
+      </p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">3</div>
+    <div>
+      <b>Odds → probability</b>
+      <p>
+        The inverse-logit compresses any log-odds value into a probability
+        between 0 and 1.
+      </p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">4</div>
+    <div>
+      <b>Interpret cautiously</b>
+      <p>
+        A prediction is not a causal effect. Attendance may reflect many other
+        supports and circumstances.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="card challenge">
+  <h2>Quick prediction challenge</h2>
+  <p class="sub">Before changing a slider, predict the direction of the change.</p>
+
+  <div class="q">
+    If β₁, the attendance coefficient, increases while the student stays the same,
+    what happens to the curve?
+  </div>
+
+  <div class="choices">
+    <button class="choice" data-answer="right">
+      It becomes steeper / probability rises faster
+    </button>
+
+    <button class="choice" data-answer="wrong">
+      It shifts down for every student
+    </button>
+
+    <button class="choice" data-answer="wrong">
+      Nothing; coefficients do not affect probability
+    </button>
+  </div>
+
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+
+  <div class="q" style="margin-top:18px">
+    Try it: set β₁ to 0.00. What does attendance do in the model?
+  </div>
+
+  <div class="feedback" id="hintFeedback">
+    Use the slider and watch the red point and curve.
+  </div>
+</section>
+
+</section>
+
+<section class="refs">
+  <b>Education-research grounding</b>
+  <p>
+    The scenario echoes education early-warning research that examines attendance,
+    course performance, and prior achievement as indicators associated with later
+    educational outcomes. The coefficients in this lab are intentionally simulated
+    for learning; they are not copied from a particular study.
+  </p>
+
+  <p>
+    Suggested readings:
+    Allensworth, E. M., & Easton, J. Q. (2007).
+    <i>What matters for staying on-track and graduating in Chicago Public High Schools</i>.
+    Consortium on Chicago School Research.
+    Also see:
+    Raju, D., & Schumacker, R. (2015).
+    <i>Exploring student characteristics of retention using logistic regression</i>.
+    International Journal of Higher Education, 4(4), 112–123.
+  </p>
+</section>
+
+<div class="footer-note">
+  Instructor note: Invite students to distinguish prediction from explanation,
+  identify the unit of a coefficient, and discuss what omitted variables could
+  make an early-warning model unfair or misleading.
+</div>
+
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  const ids = [
+    'intercept',
+    'bAttend',
+    'bPrior',
+    'attendance',
+    'prior'
+  ];
+
+  const fmt = (n, d = 2) => Number(n).toFixed(d);
+
+  function state() {
+    return {
+      b0: +$('intercept').value,
+      b1: +$('bAttend').value,
+      b2: +$('bPrior').value,
+      x1: +$('attendance').value,
+      x2: +$('prior').value
+    };
+  }
+
+  function sigmoid(z) {
+    return 1 / (1 + Math.exp(-z));
+  }
+
+  function updateLabels(s) {
+    $('interceptVal').textContent = fmt(s.b0, 1);
+    $('bAttendVal').textContent = fmt(s.b1, 2);
+    $('bPriorVal').textContent = fmt(s.b2, 3);
+    $('attendanceVal').textContent = fmt(s.x1, 0) + '%';
+    $('priorVal').textContent = fmt(s.x2, 0);
+  }
+
+  function draw(s) {
+    const c = $('plot');
+    const ctx = c.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const cssW = c.clientWidth || 820;
+    const cssH = 430;
+
+    c.width = cssW * dpr;
+    c.height = cssH * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const L = 62;
+    const R = 20;
+    const T = 22;
+    const B = 50;
+    const W = cssW - L - R;
+    const H = cssH - T - B;
+
+    ctx.clearRect(0, 0, cssW, cssH);
+    ctx.font = '12px system-ui';
+    ctx.fillStyle = '#61708a';
+    ctx.strokeStyle = '#e3eaf1';
+    ctx.lineWidth = 1;
+
+    [0, .25, .5, .75, 1].forEach(p => {
+      const y = T + H - (p * H);
+      ctx.beginPath();
+      ctx.moveTo(L, y);
+      ctx.lineTo(L + W, y);
+      ctx.stroke();
+      ctx.fillText(Math.round(p * 100) + '%', 10, y + 4);
+    });
+
+    [50, 60, 70, 80, 90, 100].forEach(x => {
+      const px = L + (x - 50) / 50 * W;
+      ctx.beginPath();
+      ctx.moveTo(px, T);
+      ctx.lineTo(px, T + H);
+      ctx.stroke();
+      ctx.fillText(x + '%', px - 12, T + H + 25);
+    });
+
+    ctx.strokeStyle = '#8ca3b5';
+    ctx.beginPath();
+    ctx.moveTo(L, T);
+    ctx.lineTo(L, T + H);
+    ctx.lineTo(L + W, T + H);
+    ctx.stroke();
+
+    ctx.fillStyle = '#61708a';
+    ctx.fillText('Attendance', L + W / 2 - 30, cssH - 10);
+
+    ctx.save();
+    ctx.translate(14, T + H / 2 + 30);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Predicted probability', 0, 0);
+    ctx.restore();
+
+    ctx.strokeStyle = '#2574a9';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+
+    for (let x = 50; x <= 100; x++) {
+      const z = s.b0 + s.b1 * x + s.b2 * s.x2;
+      const p = sigmoid(z);
+      const px = L + (x - 50) / 50 * W;
+      const py = T + H - p * H;
+
+      if (x === 50) {
+        ctx.moveTo(px, py);
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+
+    ctx.stroke();
+
+    const z = s.b0 + s.b1 * s.x1 + s.b2 * s.x2;
+    const p = sigmoid(z);
+    const px = L + (s.x1 - 50) / 50 * W;
+    const py = T + H - p * H;
+
+    ctx.fillStyle = '#dc5b62';
+    ctx.beginPath();
+    ctx.arc(px, py, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = '#dc5b62';
+    ctx.font = 'bold 12px system-ui';
+    ctx.fillText(
+      'student',
+      Math.min(px + 12, L + W - 50),
+      Math.max(py - 12, T + 15)
+    );
+
+    $('eta').textContent = fmt(z, 2);
+
+    const o = Math.exp(z);
+    $('odds').textContent = fmt(o, 2);
+    $('prob').textContent = fmt(p * 100, 1) + '%';
+
+    $('classify').textContent = p >= .5 ? 'PASS' : 'NOT PASS';
+    $('classify').style.color = p >= .5 ? '#16817a' : '#dc5b62';
+
+    $('eqText').textContent =
+      fmt(s.b0, 1) +
+      ' + (' + fmt(s.b1, 2) + ' × ' + fmt(s.x1, 0) + ')' +
+      ' + (' + fmt(s.b2, 3) + ' × ' + fmt(s.x2, 0) + ')' +
+      ' = ' + fmt(z, 2);
+  }
+
+  function render() {
+    const s = state();
+    updateLabels(s);
+    draw(s);
+  }
+
+  ids.forEach(id => {
+    $(id).addEventListener('input', render);
+  });
+
+  window.addEventListener('resize', render);
+
+  $('reset').addEventListener('click', () => {
+    [
+      ['intercept', -2.1],
+      ['bAttend', .06],
+      ['bPrior', .045],
+      ['attendance', 88],
+      ['prior', 72]
+    ].forEach(([id, value]) => {
+      $(id).value = value;
+    });
+
+    render();
+  });
+
+  $('randomize').addEventListener('click', () => {
+    $('attendance').value = 60 + Math.floor(Math.random() * 41);
+    $('prior').value = Math.floor(Math.random() * 101);
+    render();
+  });
+
+  document.querySelectorAll('.choice').forEach(button => {
+    button.addEventListener('click', () => {
+      const good = button.dataset.answer === 'right';
+
+      $('feedback').textContent = good
+        ? 'Correct. A larger positive slope means attendance changes the log-odds more quickly, so the probability curve rises faster.'
+        : 'Not quite. Focus on what β₁ multiplies: attendance. Try asking what happens to η when attendance increases.';
+
+      $('feedback').style.color = good ? '#16817a' : '#dc5b62';
+    });
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
